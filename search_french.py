@@ -25,6 +25,7 @@ def search_french(word, lang="French"):
 
     section_nodes = []
     for elem in french_heading_div.next_siblings:
+        # 各言語用のヘッダーの親のdivのクラスにはmw-heading2がある
         if getattr(elem, "name", None) == "div" and \
             "mw-heading2" in elem.get("class", []):
             break
@@ -32,6 +33,7 @@ def search_french(word, lang="French"):
 
     meanings = []
     for node in section_nodes:
+        # <ol>タグの中の<li>タグの中に意味と用例が見つかる
         if getattr(node, "name", None) == "ol":
             for li in node.find_all("li", recursive=False):
 
@@ -41,7 +43,9 @@ def search_french(word, lang="French"):
     for i, meaning in enumerate(meanings, 1):
         print(f'{i}. {meaning}')
 
-
+# コマンドラインで実行することができる。
+# search_french.pyの後に調べたい単語とどの言語かを指定する
+# 言語を指定しなかった場合はフランス語での意味を検索する
 if __name__ == '__main__':
     if len(sys.argv) == 3:
         search_french(sys.argv[1], sys.argv[2])
