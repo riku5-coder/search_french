@@ -2,9 +2,9 @@ import requests, sys
 from bs4 import BeautifulSoup
 """wiktionaryの単語ページは言語別になっていない。
 つまり、同じつづりであれば同じページに複数の言語における
-そのつづりの単語の意味が載っている。
+そのつづりの単語の意味や用例が載っている。
 なので、目当ての言語のセクションをページから抜いて、
-そこから意味だけを抜き出さなければならない"""
+そこから意味と用例だけを抜き出さなければならない"""
 def search_french(word, lang="French"):
     # 目当てのページを取得
     url = f'https://en.wiktionary.org/wiki/{word}#{lang}'
