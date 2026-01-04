@@ -34,7 +34,8 @@ def search_french(word):
     for node in section_nodes:
         if getattr(node, "name", None) == "ol":
             for li in node.find_all("li", recursive=False):
-                meanings.append(li.get_text(strip=True))
+
+                meanings.append(li.get_text())
 
     print(f'意味は{len(meanings)}あります。')
     for i, meaning in enumerate(meanings, 1):
