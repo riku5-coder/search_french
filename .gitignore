@@ -1,0 +1,10 @@
+# Python
+__pycache__/
+*.pyc
+
+# pyenvの設定ファイル
+pyvenv.cfg
+
+# Virtual Environment
+search_env_312/
+.env
