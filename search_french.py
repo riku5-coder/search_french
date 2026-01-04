@@ -1,19 +1,45 @@
-import re, requests, bs4, sys
-
+import requests, sys
+from bs4 import BeautifulSoup
+"""wiktionaryの単語ページは言語別になっていない。
+つまり、同じつづりであれば同じページに複数の言語における
+そのつづりの単語の意味が載っている。
+なので、目当ての言語のセクションをページから抜いて、
+そこから意味だけを抜き出さなければならない"""
 def search_french(word):
-    url = 'https://en.wiktionary.org/wiki/{}#French'.format(word) # formatの()内に検索したいフランス語の単語を入れる。
-    res = requests.get(url)
+    # 目当てのページを取得
+    url = 'https://en.wiktionary.org/wiki/{}#French'.format(word) 
+    headers = {
+    "User-Agent": "Mozilla/5.0"
+    }
+
+    res = requests.get(url, headers=headers)
     res.raise_for_status()
-    regex2 = re.compile(r'<span class="mw-headline" id="French">French</span>.*?<h2>', re.DOTALL)
-    mo = regex2.search(res.text)
-    soup = bs4.BeautifulSoup(mo.group())
-    meanings = soup.select('ol > li')
-    print('意味は{}つあります。'.format(len(meanings)))
-    meaning_list = []
-    for i in range(len(meanings)):
-        meaning_list.append(meanings[i].getText())
-    for i, meaning in enumerate(meaning_list):
-        print('{}.{}'.format(i+1, meaning))
+
+    soup = BeautifulSoup(res.text, "html.parser")
+
+    # 目当ての言語のセクションを探す
+    french_header = soup.find("h2", id="French")
+    if french_header is None:
+        raise ValueError("French sectionが見つかりませんでした")
+    french_heading_div = french_header.find_parent("div", class_="mw-heading2")
+    
+    section_nodes = []
+    for elem in french_heading_div.next_siblings:
+        if getattr(elem, "name", None) == "div" and \
+            "mw-heading2" in elem.get("class", []):
+            break
+        section_nodes.append(elem)
+
+    meanings = []
+    for node in section_nodes:
+        if getattr(node, "name", None) == "ol":
+            for li in node.find_all("li", recursive=False):
+                meanings.append(li.get_text(strip=True))
+
+    print(f'意味は{len(meanings)}あります。')
+    for i, meaning in enumerate(meanings, 1):
+        print(f'{i}. {meaning}')
+
 
 if __name__ == '__main__':
     search_french(sys.argv[1])
