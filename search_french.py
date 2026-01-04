@@ -5,9 +5,9 @@ from bs4 import BeautifulSoup
 そのつづりの単語の意味が載っている。
 なので、目当ての言語のセクションをページから抜いて、
 そこから意味だけを抜き出さなければならない"""
-def search_french(word):
+def search_french(word, lang="French"):
     # 目当てのページを取得
-    url = 'https://en.wiktionary.org/wiki/{}#French'.format(word) 
+    url = f'https://en.wiktionary.org/wiki/{word}#{lang}'
     headers = {
     "User-Agent": "Mozilla/5.0"
     }
@@ -18,11 +18,11 @@ def search_french(word):
     soup = BeautifulSoup(res.text, "html.parser")
 
     # 目当ての言語のセクションを探す
-    french_header = soup.find("h2", id="French")
+    french_header = soup.find("h2", id=lang)
     if french_header is None:
-        raise ValueError("French sectionが見つかりませんでした")
+        raise ValueError(f"{lang} sectionが見つかりませんでした")
     french_heading_div = french_header.find_parent("div", class_="mw-heading2")
-    
+
     section_nodes = []
     for elem in french_heading_div.next_siblings:
         if getattr(elem, "name", None) == "div" and \
@@ -43,4 +43,7 @@ def search_french(word):
 
 
 if __name__ == '__main__':
-    search_french(sys.argv[1])
+    if len(sys.argv) == 3:
+        search_french(sys.argv[1], sys.argv[2])
+    else:
+        search_french(sys.argv[1])
